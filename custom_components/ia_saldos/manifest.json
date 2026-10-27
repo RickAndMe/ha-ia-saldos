@@ -1,7 +1,7 @@
 {
   "domain": "ia_saldos",
   "name": "Saldos de IA",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "documentation": "https://github.com/RickAndMe/ha-ia-saldos",
   "issue_tracker": "https://github.com/RickAndMe/ha-ia-saldos/issues",
   "codeowners": ["@RickAndMe"],
