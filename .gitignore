@@ -1,0 +1,25 @@
+# --- secretos: nunca al repo ---
+.env
+.env.*
+secrets.yaml
+*.key
+*.pem
+*.p12
+credentials*
+token*
+*cookies*
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# --- editores / sistema ---
+.vscode/
+.idea/
+.DS_Store
+*.log

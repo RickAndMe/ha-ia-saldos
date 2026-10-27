@@ -1,0 +1,14 @@
+{
+  "domain": "ia_saldos",
+  "name": "Saldos de IA",
+  "version": "1.0.0",
+  "documentation": "https://github.com/RickAndMe/ha-ia-saldos",
+  "issue_tracker": "https://github.com/RickAndMe/ha-ia-saldos/issues",
+  "codeowners": ["@RickAndMe"],
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "integration_type": "service",
+  "dependencies": [],
+  "requirements": [],
+  "documentation_url": "https://github.com/RickAndMe/ha-ia-saldos"
+}

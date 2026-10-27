@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "AI balances",
+        "description": "Paste the API keys. You can configure just one of them.",
+        "data": {
+          "openrouter_key": "OpenRouter key",
+          "deepseek_key": "DeepSeek key"
+        }
+      }
+    },
+    "error": {
+      "sin_claves": "At least one of the two keys is required.",
+      "clave_invalida": "The key does not respond correctly on its API."
+    },
+    "abort": {
+      "already_configured": "This integration is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "credito_clave": {"name": "Key credit"},
+      "saldo_cuenta": {"name": "Account balance"},
+      "limite_clave": {"name": "Key limit"},
+      "gastado_total": {"name": "Lifetime spend"},
+      "gasto_mes": {"name": "Spent this month"},
+      "gasto_hoy": {"name": "Spent today"},
+      "creditos_comprados": {"name": "Credits purchased"},
+      "saldo": {"name": "Balance"},
+      "recargado": {"name": "Topped up balance"},
+      "regalo": {"name": "Granted balance"}
+    }
+  }
+}

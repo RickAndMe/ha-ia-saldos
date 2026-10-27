@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Saldos de IA",
+        "description": "Pega las claves de API. Puedes configurar solo una de las dos.",
+        "data": {
+          "openrouter_key": "Clave de OpenRouter",
+          "deepseek_key": "Clave de DeepSeek"
+        }
+      }
+    },
+    "error": {
+      "sin_claves": "Hace falta al menos una de las dos claves.",
+      "clave_invalida": "La clave no responde correctamente en su API."
+    },
+    "abort": {
+      "already_configured": "Esta integración ya está configurada."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "credito_clave": {"name": "Crédito de la clave"},
+      "saldo_cuenta": {"name": "Saldo de la cuenta"},
+      "limite_clave": {"name": "Límite de la clave"},
+      "gastado_total": {"name": "Gastado histórico"},
+      "gasto_mes": {"name": "Gastado este mes"},
+      "gasto_hoy": {"name": "Gastado hoy"},
+      "creditos_comprados": {"name": "Créditos comprados"},
+      "saldo": {"name": "Saldo"},
+      "recargado": {"name": "Saldo recargado"},
+      "regalo": {"name": "Saldo de regalo"}
+    }
+  }
+}
