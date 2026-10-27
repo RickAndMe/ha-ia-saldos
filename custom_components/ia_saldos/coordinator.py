@@ -15,14 +15,20 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import (
     CONF_DEEPSEEK,
     CONF_OPENROUTER,
+    CONF_PINGEN_ID,
+    CONF_PINGEN_SECRET,
     DEEPSEEK_SERVICIO,
     DOMAIN,
     OPENROUTER_SERVICIO,
+    PINGEN_SCOPE,
+    PINGEN_SERVICIO,
     TIMEOUT,
     UPDATE_INTERVAL,
     URL_DEEPSEEK_SALDO,
     URL_OPENROUTER_CLAVE,
     URL_OPENROUTER_CREDITOS,
+    URL_PINGEN_ORGANIZACIONES,
+    URL_PINGEN_TOKEN,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,12 +47,18 @@ class IaSaldosCoordinator(DataUpdateCoordinator):
         self.entry = entry
         self._session = async_get_clientsession(hass)
 
+    def _config(self, campo: str):
+        """Las opciones mandan sobre los datos del alta."""
+        return self.entry.options.get(campo) or self.entry.data.get(campo)
+
     async def _async_update_data(self) -> dict:
         datos: dict[str, dict] = {}
         errores: list[str] = []
 
-        clave_or = self.entry.data.get(CONF_OPENROUTER)
-        clave_ds = self.entry.data.get(CONF_DEEPSEEK)
+        clave_or = self._config(CONF_OPENROUTER)
+        clave_ds = self._config(CONF_DEEPSEEK)
+        pingen_id = self._config(CONF_PINGEN_ID)
+        pingen_secret = self._config(CONF_PINGEN_SECRET)
 
         if clave_or:
             try:
@@ -58,6 +70,11 @@ class IaSaldosCoordinator(DataUpdateCoordinator):
                 datos[DEEPSEEK_SERVICIO] = await self._deepseek(clave_ds)
             except Exception as err:  # noqa: BLE001
                 errores.append(f"deepseek: {err}")
+        if pingen_id and pingen_secret:
+            try:
+                datos[PINGEN_SERVICIO] = await self._pingen(pingen_id, pingen_secret)
+            except Exception as err:  # noqa: BLE001
+                errores.append(f"pingen: {err}")
 
         if not datos:
             raise UpdateFailed("; ".join(errores) or "no hay claves configuradas")
@@ -104,4 +121,57 @@ class IaSaldosCoordinator(DataUpdateCoordinator):
             "recargado": round(float(info.get("topped_up_balance") or 0), 2),
             "regalo": round(float(info.get("granted_balance") or 0), 2),
             "operativo": bool(crudo.get("is_available")),
+        }
+
+    async def _pingen(self, client_id: str, client_secret: str) -> dict:
+        """Pingen usa OAuth2 client_credentials: token y luego /organisations."""
+        formulario = {
+            "grant_type": "client_credentials",
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "scope": PINGEN_SCOPE,
+        }
+        async with asyncio.timeout(TIMEOUT):
+            async with self._session.post(URL_PINGEN_TOKEN, data=formulario) as resp:
+                if resp.status in (400, 401, 403):
+                    raise UpdateFailed(
+                        f"credenciales rechazadas ({resp.status})"
+                    )
+                if resp.status != 200:
+                    raise UpdateFailed(f"token: respuesta HTTP {resp.status}")
+                token = (await resp.json(content_type=None)).get("access_token")
+
+        if not token:
+            raise UpdateFailed("la API no devolvió access_token")
+
+        cabeceras = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.api+json",
+        }
+        async with asyncio.timeout(TIMEOUT):
+            async with self._session.get(
+                URL_PINGEN_ORGANIZACIONES, headers=cabeceras
+            ) as resp:
+                if resp.status == 401:
+                    raise UpdateFailed("token rechazado (401)")
+                if resp.status != 200:
+                    raise UpdateFailed(f"organizaciones: respuesta HTTP {resp.status}")
+                crudo = await resp.json(content_type=None)
+
+        organizaciones = crudo.get("data") or []
+        if isinstance(organizaciones, dict):
+            organizaciones = [organizaciones]
+        if not organizaciones:
+            raise UpdateFailed("la cuenta no tiene organizaciones")
+
+        org = organizaciones[0]
+        attrs = org.get("attributes") or {}
+        return {
+            "saldo": round(float(attrs.get("billing_balance") or 0), 2),
+            "moneda": attrs.get("billing_currency") or "",
+            "faltante": round(float(attrs.get("missing_credits") or 0), 2),
+            "plan": attrs.get("plan") or "desconocido",
+            "organizacion": attrs.get("name") or org.get("id"),
+            "estado": attrs.get("status") or "",
+            "facturacion": attrs.get("billing_mode") or "",
         }

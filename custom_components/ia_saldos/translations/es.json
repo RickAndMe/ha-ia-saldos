@@ -2,20 +2,41 @@
   "config": {
     "step": {
       "user": {
-        "title": "Saldos de IA",
-        "description": "Pega las claves de API. Puedes configurar solo una de las dos.",
+        "title": "Saldos",
+        "description": "Pega las claves de API que tengas. Todas son opcionales, pero hace falta al menos una.",
         "data": {
           "openrouter_key": "Clave de OpenRouter",
-          "deepseek_key": "Clave de DeepSeek"
+          "deepseek_key": "Clave de DeepSeek",
+          "pingen_client_id": "Pingen: client_id",
+          "pingen_client_secret": "Pingen: client_secret"
         }
       }
     },
     "error": {
-      "sin_claves": "Hace falta al menos una de las dos claves.",
-      "clave_invalida": "La clave no responde correctamente en su API."
+      "sin_claves": "Hace falta al menos una clave.",
+      "clave_invalida": "La clave no responde correctamente en su API.",
+      "pingen_incompleto": "Pingen necesita client_id y client_secret, los dos."
     },
     "abort": {
       "already_configured": "Esta integración ya está configurada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Claves de los servicios",
+        "description": "Lo que dejes en blanco no se toca. Rellena solo lo que quieras añadir o cambiar.",
+        "data": {
+          "openrouter_key": "Clave de OpenRouter",
+          "deepseek_key": "Clave de DeepSeek",
+          "pingen_client_id": "Pingen: client_id",
+          "pingen_client_secret": "Pingen: client_secret"
+        }
+      }
+    },
+    "error": {
+      "clave_invalida": "La clave no responde correctamente en su API.",
+      "pingen_incompleto": "Pingen necesita client_id y client_secret, los dos."
     }
   },
   "entity": {
@@ -29,7 +50,10 @@
       "creditos_comprados": {"name": "Créditos comprados"},
       "saldo": {"name": "Saldo"},
       "recargado": {"name": "Saldo recargado"},
-      "regalo": {"name": "Saldo de regalo"}
+      "regalo": {"name": "Saldo de regalo"},
+      "pingen_saldo": {"name": "Saldo"},
+      "pingen_faltante": {"name": "Créditos que faltan"},
+      "pingen_plan": {"name": "Plan"}
     }
   }
 }

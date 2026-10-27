@@ -21,7 +21,9 @@ from .const import (
     DOMAIN,
     NOMBRES_DISPOSITIVO,
     OPENROUTER_SERVICIO,
+    PINGEN_SERVICIO,
     UPDATE_INTERVAL,
+    URL_CUENTA,
 )
 from .coordinator import IaSaldosCoordinator
 
@@ -138,6 +140,30 @@ SENSORES: dict[str, tuple[SensorSaldo, ...]] = {
             entity_registry_enabled_default=False,
         ),
     ),
+    PINGEN_SERVICIO: (
+        SensorSaldo(
+            key="saldo",
+            translation_key="pingen_saldo",
+            name="Saldo",
+            icon="mdi:cash",
+            # la moneda la pone la API (CHF), se resuelve en la entidad
+            suggested_display_precision=2,
+        ),
+        SensorSaldo(
+            key="faltante",
+            translation_key="pingen_faltante",
+            name="Créditos que faltan",
+            icon="mdi:alert-circle-outline",
+            suggested_display_precision=2,
+            entity_registry_enabled_default=False,
+        ),
+        SensorSaldo(
+            key="plan",
+            translation_key="pingen_plan",
+            name="Plan",
+            icon="mdi:tag-outline",
+        ),
+    ),
 }
 
 
@@ -180,12 +206,19 @@ class SensorSaldoIA(CoordinatorEntity[IaSaldosCoordinator], SensorEntity):
             manufacturer=NOMBRES_DISPOSITIVO[servicio]["manufacturer"],
             model=NOMBRES_DISPOSITIVO[servicio]["model"],
             entry_type=DeviceEntryType.SERVICE,
-            configuration_url=(
-                "https://openrouter.ai/settings/credits"
-                if servicio == OPENROUTER_SERVICIO
-                else "https://platform.deepseek.com/top_up"
-            ),
+            configuration_url=URL_CUENTA.get(servicio),
         )
+
+    @property
+    def native_unit_of_measurement(self):
+        """Pingen devuelve la moneda en cada consulta (CHF, EUR...)."""
+        if (
+            self._servicio == PINGEN_SERVICIO
+            and self.entity_description.key == "saldo"
+        ):
+            datos = (self.coordinator.data or {}).get(PINGEN_SERVICIO) or {}
+            return datos.get("moneda") or None
+        return self.entity_description.native_unit_of_measurement
 
     @property
     def native_value(self):
@@ -204,4 +237,10 @@ class SensorSaldoIA(CoordinatorEntity[IaSaldosCoordinator], SensorEntity):
     @property
     def extra_state_attributes(self) -> dict:
         """Notas útiles para la UI."""
-        return {"cada_minutos": UPDATE_INTERVAL}
+        atributos = {"cada_minutos": UPDATE_INTERVAL}
+        if self._servicio == PINGEN_SERVICIO:
+            datos = (self.coordinator.data or {}).get(PINGEN_SERVICIO) or {}
+            for clave in ("organizacion", "estado", "facturacion", "moneda"):
+                if datos.get(clave):
+                    atributos[clave] = datos[clave]
+        return atributos

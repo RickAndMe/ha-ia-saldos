@@ -2,20 +2,41 @@
   "config": {
     "step": {
       "user": {
-        "title": "AI balances",
-        "description": "Paste the API keys. You can configure just one of them.",
+        "title": "Balances",
+        "description": "Paste the API keys you have. All are optional, but at least one is required.",
         "data": {
           "openrouter_key": "OpenRouter key",
-          "deepseek_key": "DeepSeek key"
+          "deepseek_key": "DeepSeek key",
+          "pingen_client_id": "Pingen: client_id",
+          "pingen_client_secret": "Pingen: client_secret"
         }
       }
     },
     "error": {
-      "sin_claves": "At least one of the two keys is required.",
-      "clave_invalida": "The key does not respond correctly on its API."
+      "sin_claves": "At least one key is required.",
+      "clave_invalida": "The key does not respond correctly on its API.",
+      "pingen_incompleto": "Pingen needs both client_id and client_secret."
     },
     "abort": {
       "already_configured": "This integration is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Service keys",
+        "description": "Anything left blank is kept as it is. Fill in only what you want to add or change.",
+        "data": {
+          "openrouter_key": "OpenRouter key",
+          "deepseek_key": "DeepSeek key",
+          "pingen_client_id": "Pingen: client_id",
+          "pingen_client_secret": "Pingen: client_secret"
+        }
+      }
+    },
+    "error": {
+      "clave_invalida": "The key does not respond correctly on its API.",
+      "pingen_incompleto": "Pingen needs both client_id and client_secret."
     }
   },
   "entity": {
@@ -29,7 +50,10 @@
       "creditos_comprados": {"name": "Credits purchased"},
       "saldo": {"name": "Balance"},
       "recargado": {"name": "Topped up balance"},
-      "regalo": {"name": "Granted balance"}
+      "regalo": {"name": "Granted balance"},
+      "pingen_saldo": {"name": "Balance"},
+      "pingen_faltante": {"name": "Missing credits"},
+      "pingen_plan": {"name": "Plan"}
     }
   }
 }
