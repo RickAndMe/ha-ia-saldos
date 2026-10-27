@@ -2,20 +2,41 @@
   "config": {
     "step": {
       "user": {
-        "title": "AI balances",
-        "description": "Paste the API keys. You can configure just one of them.",
+        "title": "AI balances and debrid",
+        "description": "Paste the API keys for the accounts you want to track. Leave blank the ones you don't have.",
         "data": {
-          "openrouter_key": "OpenRouter key",
-          "deepseek_key": "DeepSeek key"
+          "openrouter_key": "OpenRouter",
+          "deepseek_key": "DeepSeek",
+          "realdebrid_key": "Real-Debrid",
+          "alldebrid_key": "AllDebrid",
+          "torbox_key": "TorBox"
         }
       }
     },
     "error": {
-      "sin_claves": "At least one of the two keys is required.",
+      "sin_claves": "At least one key is required.",
       "clave_invalida": "The key does not respond correctly on its API."
     },
     "abort": {
       "already_configured": "This integration is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Account keys",
+        "description": "Fill in only the keys you want to add or change. Blank fields keep their current value.",
+        "data": {
+          "openrouter_key": "OpenRouter",
+          "deepseek_key": "DeepSeek",
+          "realdebrid_key": "Real-Debrid",
+          "alldebrid_key": "AllDebrid",
+          "torbox_key": "TorBox"
+        }
+      }
+    },
+    "error": {
+      "clave_invalida": "The key does not respond correctly on its API."
     }
   },
   "entity": {
@@ -29,7 +50,13 @@
       "creditos_comprados": {"name": "Credits purchased"},
       "saldo": {"name": "Balance"},
       "recargado": {"name": "Topped up balance"},
-      "regalo": {"name": "Granted balance"}
+      "regalo": {"name": "Granted balance"},
+      "dias_restantes": {"name": "Days left"},
+      "caduca": {"name": "Expires on"},
+      "puntos": {"name": "Fidelity points"}
+    },
+    "binary_sensor": {
+      "premium": {"name": "Premium"}
     }
   }
 }

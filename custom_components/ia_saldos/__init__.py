@@ -1,4 +1,4 @@
-"""Integración Saldos de IA: créditos de OpenRouter y DeepSeek dentro de Home Assistant."""
+"""Integración Saldos de IA: créditos de IA y suscripciones debrid en Home Assistant."""
 from __future__ import annotations
 
 import logging
@@ -7,20 +7,32 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
-from .coordinator import IaSaldosCoordinator
+from .const import CLAVES, DOMAIN
+from .coordinator import ServicioCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Prepara la entrada de configuración."""
-    coordinador = IaSaldosCoordinator(hass, entry)
-    await coordinador.async_config_entry_first_refresh()
+    """Crea un coordinador por cada servicio con clave configurada."""
+    coordinadores: dict[str, ServicioCoordinator] = {}
+    datos = {**entry.data, **entry.options}
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinador
+    for servicio, clave_conf in CLAVES.items():
+        clave = (datos.get(clave_conf) or "").strip()
+        if not clave:
+            continue
+        coordinador = ServicioCoordinator(hass, entry, servicio, clave)
+        try:
+            await coordinador.async_config_entry_first_refresh()
+        except Exception as err:  # noqa: BLE001
+            # Un servicio caído no debe impedir que arranquen los demás.
+            _LOGGER.warning("No se pudo consultar %s: %s", servicio, err)
+        coordinadores[servicio] = coordinador
+
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinadores
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.async_on_unload(entry.add_update_listener(_recarga_al_cambiar))

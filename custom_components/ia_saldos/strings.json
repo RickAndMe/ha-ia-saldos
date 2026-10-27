@@ -2,20 +2,41 @@
   "config": {
     "step": {
       "user": {
-        "title": "Saldos de IA",
-        "description": "Pega las claves de API. Puedes configurar solo una de las dos.",
+        "title": "Saldos de IA y debrid",
+        "description": "Pega las claves de las cuentas que quieras vigilar. Puedes dejar en blanco las que no tengas.",
         "data": {
-          "openrouter_key": "Clave de OpenRouter",
-          "deepseek_key": "Clave de DeepSeek"
+          "openrouter_key": "OpenRouter",
+          "deepseek_key": "DeepSeek",
+          "realdebrid_key": "Real-Debrid",
+          "alldebrid_key": "AllDebrid",
+          "torbox_key": "TorBox"
         }
       }
     },
     "error": {
-      "sin_claves": "Hace falta al menos una de las dos claves.",
+      "sin_claves": "Hace falta al menos una clave.",
       "clave_invalida": "La clave no responde correctamente en su API."
     },
     "abort": {
       "already_configured": "Esta integración ya está configurada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Claves de las cuentas",
+        "description": "Escribe solo las claves que quieras añadir o cambiar. Las que dejes en blanco se quedan como están.",
+        "data": {
+          "openrouter_key": "OpenRouter",
+          "deepseek_key": "DeepSeek",
+          "realdebrid_key": "Real-Debrid",
+          "alldebrid_key": "AllDebrid",
+          "torbox_key": "TorBox"
+        }
+      }
+    },
+    "error": {
+      "clave_invalida": "La clave no responde correctamente en su API."
     }
   },
   "entity": {
@@ -29,7 +50,13 @@
       "creditos_comprados": {"name": "Créditos comprados"},
       "saldo": {"name": "Saldo"},
       "recargado": {"name": "Saldo recargado"},
-      "regalo": {"name": "Saldo de regalo"}
+      "regalo": {"name": "Saldo de regalo"},
+      "dias_restantes": {"name": "Días que quedan"},
+      "caduca": {"name": "Caduca el"},
+      "puntos": {"name": "Puntos de fidelidad"}
+    },
+    "binary_sensor": {
+      "premium": {"name": "Premium"}
     }
   }
 }
